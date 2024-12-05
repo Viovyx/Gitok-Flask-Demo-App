@@ -39,20 +39,20 @@ python3 App.py
 ```
 
 ## Uitvoeren
-###Hello World
+### Hello World
 Surf naar je applicatie (vervang SERVER_IP door het IP addres van je server)
 ```
 http://SERVER_IP:5000/
 ```
 Je zou nu "Hello World" moeten zien.
 
-###Data toevoegen
+### Data toevoegen
 Voeg wat data toe aan je database, je kan de data achter ?content= aanpassen.
 ```
 http://SERVER_IP:5000/add_data?content=Test
 ```
 
-###Data bekijken
+### Data bekijken
 Voeg wat data toe aan je database, je kan de data achter ?content= aanpassen.
 ```
 http://SERVER_IP:5000/show_db
