@@ -1,0 +1,20 @@
+<html>
+ <head>
+  <title>Database Content</title>
+ </head>
+ <body>
+  <h1>Alles in de database</h1>
+  <table>
+   <tr>
+    <th>Id</th>
+    <th>Content</th>
+   </tr>
+  {% for row in content %}
+   <tr>
+    <td>{{row[0]}}</td>
+    <td>{{row[1]}}</td>
+   </tr>
+  {% endfor %}
+  </table>
+ </body>
+</html>
