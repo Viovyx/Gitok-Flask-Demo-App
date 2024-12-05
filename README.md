@@ -19,7 +19,7 @@ chmod +x docker_start_empty_testdb.sh
 ## setup python3 environment
 installeer de nodige python3 packages:
 ```
-sudo apt-get install python3-pip python3-venv
+sudo apt-get install python3-pip python3-venv pkg-config python3-dev default-libmysqlclient-dev build-essential
 ```
 Maak een virtual environment aan, dit moet je enkel de eerste keer doen
 ```
