@@ -1,6 +1,10 @@
+import eventlet
+eventlet.monkey_patch()
 from flask import Flask, render_template, request
 from flask_mqtt import Mqtt
+from flask_socketio import SocketIO
 import mariadb
+
 
 app = Flask(__name__)
 
@@ -21,7 +25,10 @@ app.config['MQTT_USERNAME'] = ''
 app.config['MQTT_PASSWORD'] = ''
 app.config['MQTT_KEEPALIVE'] = 5
 app.config['MQTT_TLS_ENABLED'] = False
+app.config['SECRET_KEY'] = 'secret!'
 mqtt = Mqtt(app)
+socketio = SocketIO(app, cors_allowed_origins='*')
+
 
 @app.route('/')
 def homepage():
@@ -46,6 +53,10 @@ def get_data():
     print(rows)
     return render_template('show_db.html', content=rows)
 
+@app.route('/sensor')
+def sensor():
+    return render_template('sensor.html')
+
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe('gitok/sensor1')
@@ -53,8 +64,18 @@ def handle_connect(client, userdata, flags, rc):
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     print(message.topic, message.payload.decode())
+    socketio.emit("updateSensor1", message.payload.decode())
+
+@socketio.on('connect')
+def connect():
+    print('Client connected')
+
+
+@socketio.on('disconnect')
+def disconnect():
+    print('Client disconnected',  request.sid)
 
 if __name__ == "__main__":
     cur.execute("CREATE TABLE IF NOT EXISTS TestTable (Id int AUTO_INCREMENT PRIMARY KEY, Content VARCHAR(50));")
     conn.commit()
-    app.run(host="0.0.0.0", debug=True, use_reloader=False)
+    socketio.run(app, host="0.0.0.0", debug=True, use_reloader=False)
