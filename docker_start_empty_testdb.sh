@@ -19,7 +19,7 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin d
 sudo systemctl start docker
 
 #stop en remove existing container
-docker stop gitok-test-mdb
-docker remove gitok-test-mdb
+sudo docker stop gitok-test-mdb
+sudo docker remove gitok-test-mdb
 
 sudo docker run -p 127.0.0.1:3308:3306  --name gitok-test-mdb -e MARIADB_ROOT_PASSWORD=Password123! --env MARIADB_DATABASE=example-database -d mariadb:latest
