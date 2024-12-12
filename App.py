@@ -18,6 +18,11 @@ cur = conn.cursor()
 def homepage():
     return("Hello World")
 
+@app.route('/template_example')
+def template_example():
+    name = request.args.get('naam', default = 'no name', type = str) #vraag naam in url (voeg ?naam=JeNaam toe aan de url), als er geen naam wordt meegegeven wordt "no name" gebruikt als naam.
+    return render_template('template_example.html', name=name)
+
 @app.route('/add_data')
 def init_db():
     content = request.args.get('content', default = 'DEFAULT_RESPONSE', type = str)
