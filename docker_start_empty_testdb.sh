@@ -22,4 +22,4 @@ sudo systemctl start docker
 docker stop gitok-test-mdb
 docker remove gitok-test-mdb
 
-docker run -p 127.0.0.1:3308:3306  --name gitok-test-mdb -e MARIADB_ROOT_PASSWORD=Password123! --env MARIADB_DATABASE=example-database -d mariadb:latest
+sudo docker run -p 127.0.0.1:3308:3306  --name gitok-test-mdb -e MARIADB_ROOT_PASSWORD=Password123! --env MARIADB_DATABASE=example-database -d mariadb:latest
