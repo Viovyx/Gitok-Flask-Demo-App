@@ -57,6 +57,15 @@ def get_data():
 def sensor():
     return render_template('sensor.html')
 
+@app.route('/actuator', methods=['GET', 'POST'])
+def actuator():
+    if request.method == 'POST':
+        value = request.form.get('value')
+        mqtt.publish('gitok/Actuator1', value)
+        return ("thanks for inputting " + value)
+    else:
+        return render_template('actuator.html')
+
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
     mqtt.subscribe('gitok/sensor1')
