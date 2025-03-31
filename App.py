@@ -1,10 +1,13 @@
 import eventlet
 eventlet.monkey_patch()
+import os
+from dotenv import load_dotenv
 from flask import Flask, render_template, request
-from flask_mqtt import Mqtt
+from flask_mqtt import Mqtt, ssl
 from flask_socketio import SocketIO
 import mariadb
-
+from datetime import datetime
+from random import random
 
 app = Flask(__name__)
 
@@ -19,16 +22,23 @@ mariadb_config = {
 conn = mariadb.connect(**mariadb_config)
 cur = conn.cursor()
 
-app.config['MQTT_BROKER_URL'] = 'broker.hivemq.com'
-app.config['MQTT_BROKER_PORT'] = 1883
-app.config['MQTT_USERNAME'] = ''
-app.config['MQTT_PASSWORD'] = ''
-app.config['MQTT_KEEPALIVE'] = 5
-app.config['MQTT_TLS_ENABLED'] = False
-app.config['SECRET_KEY'] = 'secret!'
+app.config['MQTT_BROKER_URL'] = os.getenv('MQTT_BROKER_URL')
+app.config['MQTT_BROKER_PORT'] = os.getenv('MQTT_BROKER_PORT')
+app.config['MQTT_USERNAME'] = os.getenv('MQTT_USERNAME')
+app.config['MQTT_PASSWORD'] = os.getenv('MQTT_PASSWORD')
+app.config['MQTT_KEEPALIVE'] = os.getenv('MQTT_KEEPALIVE')
+app.config['MQTT_TLS_ENABLED'] = os.getenv('MQTT_TLS_ENABLED')
+app.config['MQTT_TLS_INSECURE'] = os.getenv('MQTT_TLS_INSECURE')
+app.config['MQTT_TLS_CA_CERTS'] = os.getenv('MQTT_TLS_CA_CERTS')
+app.config['MQTT_TLS_VERSION'] = os.getenv('MQTT_TLS_VERSION')
+app.config['MQTT_TLS_CIPHERS'] = os.getenv('MQTT_TLS_CIPHERS')
+app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 mqtt = Mqtt(app)
 socketio = SocketIO(app, cors_allowed_origins='*')
 
+def get_current_datetime():
+    now = datetime.now()
+    return now.strftime("%m/%d/%Y %H:%M:%S")
 
 @app.route('/')
 def homepage():
@@ -53,6 +63,15 @@ def get_data():
     print(rows)
     return render_template('show_db.html', content=rows)
 
+@app.route('/rm_data')
+def rm_data():
+    row = request.args.get('id', default = '-1', type = str)
+    if (int(row) >= 0):
+        cur.execute("DELETE FROM TestTable WHERE Id=%s;", (row,))
+        conn.commit()
+        return ("row " + row + " removed")
+    return ("ERROR: Enter a number above 0!")
+
 @app.route('/sensor')
 def sensor():
     return render_template('sensor.html')
@@ -61,20 +80,36 @@ def sensor():
 def actuator():
     if request.method == 'POST':
         value = request.form.get('value')
-        mqtt.publish('gitok/Actuator1', value)
-        return ("thanks for inputting " + value)
+        mqtt.publish('Viovyx/feeds/gitok.actuator1', value)
+        return render_template('actuator.html', value=value)
+        # return ("thanks for inputting " + value)
     else:
         return render_template('actuator.html')
+    
+@app.route('/graph')
+def graph():
+    return render_template('graph.html')
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
-    mqtt.subscribe('gitok/sensor1')
+    mqtt.subscribe('Viovyx/feeds/gitok.graph')
+    mqtt.subscribe('Viovyx/feeds/gitok.sensor1')
+    mqtt.subscribe('Viovyx/feeds/gitok.actuator1')
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     print(message.topic, message.payload.decode())
-    socketio.emit("updateSensor1", message.payload.decode())
-
+    if (message.topic == "Viovyx/feeds/gitok.sensor1"):
+        socketio.emit("updateSensor1", message.payload.decode())
+    if (message.topic == "Viovyx/feeds/gitok.actuator1"):
+        socketio.emit("updateActuator1", message.payload.decode())
+    if (message.topic == "Viovyx/feeds/gitok.graph"):
+        if (message.payload.decode() == "random"):
+            random_value = round(random() * 100)
+            mqtt.publish("Viovyx/feeds/gitok.graph", random_value)
+        else:
+            socketio.emit('updateSensorData', {'value': message.payload.decode(), 
+                                            "date": get_current_datetime()})
 @socketio.on('connect')
 def connect():
     print('Client connected')

@@ -4,3 +4,4 @@ eventlet
 flask_mqtt
 flask_socketio
 flask_bootstrap
+python-dotenv
