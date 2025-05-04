@@ -25,10 +25,10 @@ cur = conn.cursor()
 load_dotenv()
 mqtt_user = os.getenv('MQTT_USERNAME')
 app.config['MQTT_BROKER_URL'] = os.getenv('MQTT_BROKER_URL')
-app.config['MQTT_BROKER_PORT'] = os.getenv('MQTT_BROKER_PORT')
+app.config['MQTT_BROKER_PORT'] = int(os.getenv('MQTT_BROKER_PORT'))
 app.config['MQTT_USERNAME'] = os.getenv('MQTT_USERNAME')
 app.config['MQTT_PASSWORD'] = os.getenv('MQTT_PASSWORD')
-app.config['MQTT_KEEPALIVE'] = os.getenv('MQTT_KEEPALIVE')
+app.config['MQTT_KEEPALIVE'] = int(os.getenv('MQTT_KEEPALIVE'))
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
 
 app.config['MQTT_TLS_ENABLED'] = True
