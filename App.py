@@ -82,7 +82,7 @@ def sensor():
 def actuator():
     if request.method == 'POST':
         value = request.form.get('value')
-        mqtt.publish(f'{mqtt_user}/feeds/gitok.actuator1', value)
+        mqtt.publish(f'{mqtt_user}/feeds/actuator1', value)
         return render_template('actuator.html', value=value)
         # return ("thanks for inputting " + value)
     else:
@@ -94,21 +94,21 @@ def graph():
 
 @mqtt.on_connect()
 def handle_connect(client, userdata, flags, rc):
-    mqtt.subscribe(f'{mqtt_user}/feeds/gitok.graph')
-    mqtt.subscribe(f'{mqtt_user}/feeds/gitok.sensor1')
-    mqtt.subscribe(f'{mqtt_user}/feeds/gitok.actuator1')
+    mqtt.subscribe(f'{mqtt_user}/feeds/graph')
+    mqtt.subscribe(f'{mqtt_user}/feeds/sensor1')
+    mqtt.subscribe(f'{mqtt_user}/feeds/actuator1')
 
 @mqtt.on_message()
 def handle_mqtt_message(client, userdata, message):
     print(message.topic, message.payload.decode())
-    if (message.topic == f"{mqtt_user}/feeds/gitok.sensor1"):
+    if (message.topic == f"{mqtt_user}/feeds/sensor1"):
         socketio.emit("updateSensor1", message.payload.decode())
-    if (message.topic == f"{mqtt_user}/feeds/gitok.actuator1"):
+    if (message.topic == f"{mqtt_user}/feeds/actuator1"):
         socketio.emit("updateActuator1", message.payload.decode())
-    if (message.topic == f"{mqtt_user}/feeds/gitok.graph"):
+    if (message.topic == f"{mqtt_user}/feeds/graph"):
         if (message.payload.decode() == "random"):
             random_value = round(random() * 100)
-            mqtt.publish(f"{mqtt_user}/feeds/gitok.graph", random_value)
+            mqtt.publish(f"{mqtt_user}/feeds/graph", random_value)
         else:
             socketio.emit('updateSensorData', {'value': message.payload.decode(), 
                                             "date": get_current_datetime()})
