@@ -22,8 +22,8 @@ mariadb_config = {
 conn = mariadb.connect(**mariadb_config)
 cur = conn.cursor()
 
+load_dotenv()
 mqtt_user = os.getenv('MQTT_USERNAME')
-
 app.config['MQTT_BROKER_URL'] = os.getenv('MQTT_BROKER_URL')
 app.config['MQTT_BROKER_PORT'] = os.getenv('MQTT_BROKER_PORT')
 app.config['MQTT_USERNAME'] = os.getenv('MQTT_USERNAME')
