@@ -29,12 +29,14 @@ app.config['MQTT_BROKER_PORT'] = os.getenv('MQTT_BROKER_PORT')
 app.config['MQTT_USERNAME'] = os.getenv('MQTT_USERNAME')
 app.config['MQTT_PASSWORD'] = os.getenv('MQTT_PASSWORD')
 app.config['MQTT_KEEPALIVE'] = os.getenv('MQTT_KEEPALIVE')
-app.config['MQTT_TLS_ENABLED'] = os.getenv('MQTT_TLS_ENABLED')
-app.config['MQTT_TLS_INSECURE'] = os.getenv('MQTT_TLS_INSECURE')
-app.config['MQTT_TLS_CA_CERTS'] = os.getenv('MQTT_TLS_CA_CERTS')
-app.config['MQTT_TLS_VERSION'] = os.getenv('MQTT_TLS_VERSION')
-app.config['MQTT_TLS_CIPHERS'] = os.getenv('MQTT_TLS_CIPHERS')
 app.config['SECRET_KEY'] = os.getenv('SECRET_KEY')
+
+app.config['MQTT_TLS_ENABLED'] = True
+app.config['MQTT_TLS_INSECURE'] = False
+app.config['MQTT_TLS_CA_CERTS'] = 'DigiCert_Global_Root_G2.pem'
+app.config['MQTT_TLS_VERSION'] = ssl.PROTOCOL_TLSv1_2
+app.config['MQTT_TLS_CIPHERS'] = None # None to use the defaults encryption ciphers
+
 mqtt = Mqtt(app)
 socketio = SocketIO(app, cors_allowed_origins='*')
 
